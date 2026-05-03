@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLBB Training Progress</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#03070f;--bg1:#070e1c;--bg2:#0c1628;--bg3:#111f38;--bg4:#172843;
+  --rim:#1c3050;--rim2:#2a4568;
+  --text:#ccddf0;--soft:#6a8fac;--faint:#1a2e45;
+  --cyan:#00d4ff;--blue:#2563eb;--gold:#f59e0b;--amber:#fbbf24;
+  --green:#10b981;--rose:#f43f5e;--violet:#8b5cf6;--orange:#f97316;
+  --ch1:#2563eb;--ch2:#10b981;--ch3:#f97316;--ch4:#f43f5e;--cm:#f59e0b;
+  --tank:#3b82f6;--fighter:#f97316;--assassin:#8b5cf6;
+  --mage:#ec4899;--marksman:#22c55e;--support:#eab308;
+  --gold-lane:#fbbf24;--exp:#94a3b8;--mid:#ec4899;--jungle:#22c55e;--roam:#3b82f6;
+  --prio:#ff4d00;--prio2:#ff8c42;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Exo 2',sans-serif;background:var(--ink);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 15% 15%,rgba(37,99,235,.06) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 40% at 85% 85%,rgba(245,158,11,.05) 0%,transparent 60%);
+  pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(0,212,255,.018) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(0,212,255,.018) 1px,transparent 1px);
+  background-size:36px 36px;pointer-events:none;z-index:0}
+.wrap{position:relative;z-index:1;max-width:1500px;margin:0 auto;padding:0 20px 80px}
+
+/* HEADER */
+header{padding:28px 0 20px;border-bottom:1px solid var(--rim);margin-bottom:22px;
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.hx{width:46px;height:46px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue';font-size:1rem;color:#fff;
+  position:relative}
+.hx::after{content:'';position:absolute;inset:-3px;
+  background:linear-gradient(135deg,var(--cyan),var(--blue));
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);
+  z-index:-1;filter:blur(8px);opacity:.5}
+.h-title h1{font-family:'Bebas Neue';font-size:2.4rem;letter-spacing:4px;line-height:1;
+  background:linear-gradient(90deg,var(--cyan),#fff 45%,var(--amber));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.h-title p{font-size:.68rem;color:var(--soft);letter-spacing:3px;text-transform:uppercase;margin-top:4px}
+.h-stats{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+
+/* BACKUP BUTTONS */
+.bkp-wrap{display:flex;gap:7px;margin-left:8px;flex-shrink:0}
+.bkp-btn{
+  font-family:'Exo 2';font-size:.7rem;font-weight:700;
+  letter-spacing:.8px;text-transform:uppercase;
+  padding:8px 14px;border-radius:7px;cursor:pointer;
+  transition:all .2s;white-space:nowrap;display:flex;
+  align-items:center;gap:5px;border:none;
+}
+.bkp-btn.save{
+  background:linear-gradient(135deg,rgba(16,185,129,.18),rgba(16,185,129,.08));
+  border:1px solid rgba(16,185,129,.45);color:var(--green);
+}
+.bkp-btn.save:hover{background:rgba(16,185,129,.28);border-color:var(--green);
+  box-shadow:0 0 12px rgba(16,185,129,.2)}
+.bkp-btn.load{
+  background:linear-gradient(135deg,rgba(37,99,235,.18),rgba(0,212,255,.08));
+  border:1px solid rgba(0,212,255,.35);color:var(--cyan);
+}
+.bkp-btn.load:hover{background:rgba(0,212,255,.15);border-color:var(--cyan);
+  box-shadow:0 0 12px rgba(0,212,255,.15)}
+
+/* PROGRESS PANELS */
+.prog-panels{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+@media(max-width:760px){.prog-panels{grid-template-columns:1fr}}
+.panel{background:var(--bg2);border:1px solid var(--rim);border-radius:12px;padding:16px 20px}
+.panel-title{font-family:'Bebas Neue';font-size:1rem;letter-spacing:2px;color:var(--soft);
+  text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.panel-title span{font-family:'Bebas Neue';font-size:1.4rem;color:var(--cyan)}
+
+/* hero chapter distribution */
+.ch-dist{display:flex;gap:0;border-radius:8px;overflow:hidden;height:32px;margin-bottom:10px}
+.ch-seg{display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue';font-size:.8rem;transition:flex .5s ease;
+  white-space:nowrap;overflow:hidden;min-width:0}
+.ch-dist-labels{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.ch-label{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--soft)}
+.ch-dot{width:8px;height:8px;border-radius:50%}
+.ch-label strong{color:var(--text)}
+
+/* chapter completion bar */
+.prog-row{margin-bottom:10px}
+.prog-label{display:flex;justify-content:space-between;align-items:center;
+  font-size:.7rem;color:var(--soft);margin-bottom:5px}
+.prog-label strong{color:var(--text);font-size:.8rem}
+.prog-label .pct{font-family:'Bebas Neue';font-size:1rem;color:var(--cyan)}
+.track{height:8px;background:var(--bg1);border-radius:99px;overflow:hidden}
+.fill{height:100%;border-radius:99px;transition:width .8s ease;position:relative}
+.fill-main{background:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet),var(--amber))}
+.fill-done{background:linear-gradient(90deg,var(--amber),var(--orange))}
+.fill-rem{background:var(--faint)}
+.stat3{display:flex;gap:10px;margin-top:12px}
+.s3{flex:1;background:var(--bg3);border:1px solid var(--rim);border-radius:8px;
+  padding:8px 12px;text-align:center}
+.s3-n{font-family:'Bebas Neue';font-size:1.5rem;line-height:1}
+.s3-l{font-size:.6rem;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+.s3.t-total .s3-n{color:var(--soft)}
+.s3.t-done .s3-n{color:var(--green)}
+.s3.t-rem .s3-n{color:var(--rose)}
+
+/* CONTROLS */
+.ctrl-wrap{background:var(--bg2);border:1px solid var(--rim);border-radius:12px;
+  padding:14px 18px;margin-bottom:18px}
+.ctrl-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.ctrl-row:last-child{margin-bottom:0}
+.ctrl-lbl{font-size:.62rem;color:var(--soft);text-transform:uppercase;letter-spacing:2px;
+  white-space:nowrap;min-width:56px}
+.fbg{display:flex;gap:5px;flex-wrap:wrap}
+.fb{font-family:'Exo 2';font-size:.68rem;font-weight:600;letter-spacing:.5px;
+  padding:5px 12px;border-radius:5px;border:1px solid var(--rim);
+  background:var(--bg3);color:var(--soft);cursor:pointer;transition:all .15s;
+  text-transform:uppercase;white-space:nowrap}
+.fb:hover{border-color:var(--cyan);color:var(--cyan)}
+.fb.on{font-weight:700}
+.fb[data-role="Tank"].on{background:rgba(59,130,246,.15);border-color:var(--tank);color:var(--tank)}
+.fb[data-role="Fighter"].on{background:rgba(249,115,22,.15);border-color:var(--fighter);color:var(--fighter)}
+.fb[data-role="Assassin"].on{background:rgba(139,92,246,.15);border-color:var(--assassin);color:var(--assassin)}
+.fb[data-role="Mage"].on{background:rgba(236,72,153,.15);border-color:var(--mage);color:var(--mage)}
+.fb[data-role="Marksman"].on{background:rgba(34,197,94,.15);border-color:var(--marksman);color:var(--marksman)}
+.fb[data-role="Support"].on{background:rgba(234,179,8,.15);border-color:var(--support);color:var(--support)}
+.fb[data-role="ALL"].on,.fb[data-lane="ALL"].on,.fb[data-ch="ALL"].on,.fb[data-sort].on{
+  background:rgba(0,212,255,.1);border-color:var(--cyan);color:var(--cyan)}
+.fb[data-lane="Gold"].on{background:rgba(251,191,36,.12);border-color:var(--gold-lane);color:var(--gold-lane)}
+.fb[data-lane="Exp"].on{background:rgba(148,163,184,.12);border-color:var(--exp);color:var(--exp)}
+.fb[data-lane="Mid"].on{background:rgba(236,72,153,.12);border-color:var(--mid);color:var(--mid)}
+.fb[data-lane="Jungle"].on{background:rgba(34,197,94,.12);border-color:var(--jungle);color:var(--jungle)}
+.fb[data-lane="Roam"].on{background:rgba(59,130,246,.12);border-color:var(--roam);color:var(--roam)}
+.fb[data-ch="1"].on{background:rgba(37,99,235,.15);border-color:var(--ch1);color:var(--ch1)}
+.fb[data-ch="2"].on{background:rgba(16,185,129,.15);border-color:var(--ch2);color:var(--ch2)}
+.fb[data-ch="3"].on{background:rgba(249,115,22,.15);border-color:var(--ch3);color:var(--ch3)}
+.fb[data-ch="4"].on{background:rgba(244,63,94,.15);border-color:var(--ch4);color:var(--ch4)}
+.fb[data-ch="Completed"].on{background:rgba(245,158,11,.15);border-color:var(--cm);color:var(--cm)}
+.sep{width:1px;height:26px;background:var(--rim);flex-shrink:0;align-self:center}
+.search-box{margin-left:auto;position:relative}
+.search-box input{font-family:'Exo 2';background:var(--bg3);border:1px solid var(--rim);
+  color:var(--text);border-radius:7px;padding:6px 12px 6px 32px;
+  font-size:.78rem;width:200px;outline:none;transition:border-color .2s}
+.search-box input:focus{border-color:var(--cyan)}
+.search-box input::placeholder{color:var(--soft)}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--soft);font-size:.85rem;pointer-events:none}
+
+/* RESULT BAR */
+.result-bar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.rc{font-size:.72rem;color:var(--soft)}
+.sort-grp{display:flex;gap:5px;margin-left:auto}
+.sb{font-family:'Exo 2';font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.5px;
+  padding:4px 10px;border-radius:4px;border:1px solid var(--rim);
+  background:transparent;color:var(--soft);cursor:pointer;transition:all .15s}
+.sb:hover,.sb.on{border-color:var(--cyan);color:var(--cyan);background:rgba(0,212,255,.07)}
+
+/* GRID */
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(285px,1fr));gap:11px}
+
+/* SECTION HEADER */
+.sec-hdr{grid-column:1/-1;display:flex;align-items:center;gap:10px;
+  padding:6px 0 3px;margin-top:10px}
+.sec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.sec-name{font-family:'Bebas Neue';font-size:.95rem;letter-spacing:3px}
+.sec-line{flex:1;height:1px;background:var(--faint)}
+.sec-cnt{font-size:.62rem;color:var(--soft);background:var(--bg2);border:1px solid var(--rim);
+  border-radius:20px;padding:2px 8px}
+
+/* CARDS */
+.card{background:var(--bg1);border:1px solid var(--rim);border-radius:11px;
+  overflow:hidden;cursor:pointer;transition:transform .17s,border-color .18s,box-shadow .18s;
+  animation:fadeUp .3s ease both;position:relative}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card:hover{transform:translateY(-2px);border-color:var(--rim2);
+  box-shadow:0 10px 28px rgba(0,0,0,.45)}
+.card[data-ch="1"]:hover{border-color:rgba(37,99,235,.45);box-shadow:0 8px 24px rgba(37,99,235,.1)}
+.card[data-ch="2"]:hover{border-color:rgba(16,185,129,.45);box-shadow:0 8px 24px rgba(16,185,129,.1)}
+.card[data-ch="3"]:hover{border-color:rgba(249,115,22,.45);box-shadow:0 8px 24px rgba(249,115,22,.1)}
+.card[data-ch="4"]:hover{border-color:rgba(244,63,94,.45);box-shadow:0 8px 24px rgba(244,63,94,.1)}
+.card[data-ch="Completed"]{border-color:rgba(245,158,11,.2);
+  background:linear-gradient(160deg,#0b1220,#10180a)}
+.card[data-ch="Completed"]:hover{border-color:rgba(245,158,11,.5);
+  box-shadow:0 8px 24px rgba(245,158,11,.12)}
+
+/* chapter stripe */
+.card-stripe{height:3px;width:100%}
+.card[data-ch="1"] .card-stripe{background:linear-gradient(90deg,var(--ch1),transparent)}
+.card[data-ch="2"] .card-stripe{background:linear-gradient(90deg,var(--ch2),transparent)}
+.card[data-ch="3"] .card-stripe{background:linear-gradient(90deg,var(--ch3),transparent)}
+.card[data-ch="4"] .card-stripe{background:linear-gradient(90deg,var(--ch4),transparent)}
+.card[data-ch="Completed"] .card-stripe{background:linear-gradient(90deg,var(--cm),var(--orange))}
+
+.card-body{padding:13px 14px}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:6px;margin-bottom:8px}
+.hero-name{font-family:'Bebas Neue';font-size:1.2rem;letter-spacing:1.5px;line-height:1}
+.card[data-ch="Completed"] .hero-name{color:var(--amber)}
+.rpills{display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;flex-shrink:0}
+.rp{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;
+  padding:2px 6px;border-radius:3px}
+.rp-Tank{background:rgba(59,130,246,.15);color:var(--tank);border:1px solid rgba(59,130,246,.3)}
+.rp-Fighter{background:rgba(249,115,22,.15);color:var(--fighter);border:1px solid rgba(249,115,22,.3)}
+.rp-Assassin{background:rgba(139,92,246,.15);color:var(--assassin);border:1px solid rgba(139,92,246,.3)}
+.rp-Mage{background:rgba(236,72,153,.15);color:var(--mage);border:1px solid rgba(236,72,153,.3)}
+.rp-Marksman{background:rgba(34,197,94,.15);color:var(--marksman);border:1px solid rgba(34,197,94,.3)}
+.rp-Support{background:rgba(234,179,8,.15);color:var(--support);border:1px solid rgba(234,179,8,.3)}
+
+/* chapter badge */
+.ch-badge{display:inline-flex;align-items:center;gap:4px;font-size:.62rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.8px;padding:2px 8px;border-radius:3px;margin-bottom:7px}
+.card[data-ch="1"] .ch-badge{background:rgba(37,99,235,.12);color:var(--ch1);border:1px solid rgba(37,99,235,.25)}
+.card[data-ch="2"] .ch-badge{background:rgba(16,185,129,.12);color:var(--ch2);border:1px solid rgba(16,185,129,.25)}
+.card[data-ch="3"] .ch-badge{background:rgba(249,115,22,.12);color:var(--ch3);border:1px solid rgba(249,115,22,.25)}
+.card[data-ch="4"] .ch-badge{background:rgba(244,63,94,.12);color:var(--ch4);border:1px solid rgba(244,63,94,.25)}
+.card[data-ch="Completed"] .ch-badge{background:rgba(245,158,11,.12);color:var(--cm);border:1px solid rgba(245,158,11,.35)}
+
+/* chapter dots */
+.ch-dots{display:flex;gap:4px;margin-bottom:7px}
+.cd{width:16px;height:5px;border-radius:3px;background:var(--faint);transition:background .3s}
+.cd.done{background:var(--cm)}
+.cd.active{background:var(--cyan)}
+
+.lane-tag{font-size:.6rem;color:var(--soft);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+
+.task-text{font-size:.74rem;color:#7090b8;line-height:1.4;margin-bottom:10px;min-height:28px}
+.card[data-ch="Completed"] .task-text{color:var(--soft);font-style:italic}
+
+/* progress */
+.prog-bottom{display:flex;align-items:center;gap:7px}
+.pb-track{flex:1;height:5px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.pb-fill{height:100%;border-radius:99px;transition:width .6s .1s ease}
+.card[data-ch="1"] .pb-fill{background:linear-gradient(90deg,var(--ch1),#60a5fa)}
+.card[data-ch="2"] .pb-fill{background:linear-gradient(90deg,var(--ch2),#34d399)}
+.card[data-ch="3"] .pb-fill{background:linear-gradient(90deg,var(--ch3),#fb923c)}
+.card[data-ch="4"] .pb-fill{background:linear-gradient(90deg,var(--ch4),#fb7185)}
+.card[data-ch="Completed"] .pb-fill{background:linear-gradient(90deg,var(--cm),var(--orange));width:100%!important}
+.pb-num{font-family:'Bebas Neue';font-size:.88rem;min-width:52px;text-align:right;letter-spacing:.5px}
+.card[data-ch="1"] .pb-num{color:var(--ch1)}
+.card[data-ch="2"] .pb-num{color:var(--ch2)}
+.card[data-ch="3"] .pb-num{color:var(--ch3)}
+.card[data-ch="4"] .pb-num{color:var(--ch4)}
+.card[data-ch="Completed"] .pb-num{color:var(--cm)}
+.edit-hint{font-size:.55rem;color:var(--faint);text-align:right;margin-top:5px;transition:color .2s}
+.card:hover .edit-hint{color:var(--soft)}
+
+/* PRIORITY */
+.prio-flame-icon{
+  font-size:.95rem;line-height:1;
+  margin-left:6px;
+  display:inline-block;
+  vertical-align:middle;
+  filter:drop-shadow(0 0 4px rgba(255,100,0,.6));
+  animation:flame-flicker 1.8s ease-in-out infinite;
+}
+@keyframes flame-flicker{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.15) rotate(3deg)}}
+.card.is-prio{border-color:rgba(255,77,0,.28)}
+.card.is-prio:hover{border-color:rgba(255,77,0,.6);box-shadow:0 8px 28px rgba(255,77,0,.15)}
+@keyframes prio-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,77,0,0)}50%{box-shadow:0 0 10px 2px rgba(255,77,0,.12)}}
+.card.is-prio{animation:prio-pulse 2.5s ease-in-out infinite}
+.card.is-prio:hover{animation:none}
+/* priority filter button */
+.fb[data-prio="true"].on{background:rgba(255,77,0,.15);border-color:var(--prio);color:var(--prio)}
+
+/* PRIORITY TOGGLE in modal */
+.prio-toggle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 14px;border-radius:9px;
+  border:1px solid var(--rim2);background:var(--bg3);
+  cursor:pointer;transition:all .2s;margin-bottom:14px;
+  user-select:none;
+}
+.prio-toggle-row:hover{border-color:rgba(255,77,0,.4)}
+.prio-toggle-row.active{border-color:rgba(255,77,0,.5);background:rgba(255,77,0,.06)}
+.prio-toggle-label{display:flex;align-items:center;gap:8px;font-size:.82rem;font-weight:600}
+.prio-toggle-label .pico{font-size:1.1rem}
+.prio-toggle-label .ptxt{color:var(--text)}
+.prio-toggle-label .pdesc{font-size:.68rem;color:var(--soft);margin-top:2px}
+.prio-switch{width:38px;height:20px;background:var(--rim2);border-radius:99px;
+  position:relative;transition:background .2s;flex-shrink:0}
+.prio-switch::after{content:'';position:absolute;left:3px;top:3px;
+  width:14px;height:14px;border-radius:50%;background:#fff;
+  transition:transform .2s,background .2s}
+.prio-toggle-row.active .prio-switch{background:var(--prio)}
+.prio-toggle-row.active .prio-switch::after{transform:translateX(18px)}
+
+/* EMPTY */
+#empty{display:none;grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--soft)}
+#empty svg{opacity:.2;margin-bottom:14px}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;
+  display:none;align-items:center;justify-content:center;padding:20px;
+  backdrop-filter:blur(4px)}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--rim2);border-radius:14px;
+  width:100%;max-width:500px;overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.modal-header{padding:18px 22px 14px;border-bottom:1px solid var(--rim);
+  display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Bebas Neue';font-size:1.5rem;letter-spacing:2px;color:var(--cyan)}
+.modal-subtitle{font-size:.7rem;color:var(--soft);margin-top:2px}
+.modal-close{background:none;border:none;color:var(--soft);font-size:1.3rem;
+  cursor:pointer;padding:2px 6px;border-radius:4px;transition:color .15s}
+.modal-close:hover{color:var(--text)}
+.modal-body{padding:18px 22px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:.68rem;color:var(--soft);text-transform:uppercase;
+  letter-spacing:1px;margin-bottom:5px;font-weight:600}
+.field select,.field input,.field textarea{width:100%;font-family:'Exo 2';
+  background:var(--bg3);border:1px solid var(--rim2);color:var(--text);
+  border-radius:7px;padding:8px 12px;font-size:.85rem;outline:none;
+  transition:border-color .2s}
+.field select:focus,.field input:focus,.field textarea:focus{border-color:var(--cyan)}
+.field textarea{resize:vertical;min-height:64px}
+.field select option{background:var(--bg3)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field input:disabled,.field textarea:disabled{opacity:.5;cursor:not-allowed}
+.mastery-preview{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);
+  border-radius:8px;padding:10px 14px;margin-bottom:14px;
+  font-size:.78rem;color:var(--amber);display:none}
+.mastery-preview.show{display:block}
+.modal-footer{padding:14px 22px;border-top:1px solid var(--rim);display:flex;gap:8px;justify-content:flex-end}
+.btn-save{font-family:'Exo 2';font-size:.78rem;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;padding:9px 24px;border-radius:7px;cursor:pointer;
+  background:linear-gradient(135deg,var(--blue),var(--cyan));
+  border:none;color:#fff;transition:opacity .2s;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.btn-save:hover{opacity:.9}
+.btn-cancel{font-family:'Exo 2';font-size:.78rem;font-weight:600;letter-spacing:1px;
+  text-transform:uppercase;padding:9px 20px;border-radius:7px;cursor:pointer;
+  background:transparent;border:1px solid var(--rim2);color:var(--soft);transition:all .15s}
+.btn-cancel:hover{border-color:var(--text);color:var(--text)}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;z-index:200;
+  background:var(--bg3);border:1px solid var(--green);border-radius:8px;
+  padding:10px 18px;font-size:.8rem;color:var(--green);
+  transform:translateY(80px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:none;opacity:1}
+
+/* ── TABLET ── */
+@media(max-width:860px){
+  .wrap{padding:0 14px 70px}
+  .prog-panels{grid-template-columns:1fr}
+  .h-title h1{font-size:2rem}
+  .ctrl-row{gap:7px}
+  .sep{display:none}
+}
+
+/* ── MOBILE — iPhone 12 Pro (390px) · Samsung S25 Ultra (412px) ── */
+@media(max-width:480px){
+  .wrap{padding:0 10px 70px}
+
+  /* Header — stack into two rows */
+  header{padding:14px 0 12px;gap:8px;flex-wrap:wrap}
+  .hx{width:34px;height:34px;font-size:.75rem}
+  .h-title h1{font-size:1.5rem;letter-spacing:2px}
+  .h-title p{font-size:.58rem;letter-spacing:1px;margin-top:3px}
+  .h-stats{margin-left:0;width:100%;justify-content:space-between;gap:5px;flex-wrap:nowrap}
+  .bkp-wrap{margin-left:0;width:100%;gap:6px}
+  .bkp-btn{flex:1;justify-content:center;padding:11px 10px;font-size:.7rem}
+
+  /* Progress panels */
+  .prog-panels{grid-template-columns:1fr;gap:9px;margin-bottom:14px}
+  .panel{padding:12px 13px}
+  .panel-title{font-size:.85rem;margin-bottom:10px}
+  .panel-title span{font-size:1.2rem}
+  .ch-dist{height:24px}
+  .ch-dist-labels{gap:5px}
+  .ch-label{font-size:.6rem}
+  .prog-label{font-size:.65rem}
+  .prog-label .pct{font-size:.9rem}
+  .track{height:7px}
+  .stat3{gap:6px;margin-top:10px}
+  .s3{padding:7px 8px}
+  .s3-n{font-size:1.2rem}
+  .s3-l{font-size:.52rem}
+
+  /* Controls */
+  .ctrl-wrap{padding:10px 10px;border-radius:10px;margin-bottom:13px}
+  .ctrl-row{gap:5px;margin-bottom:7px;flex-wrap:wrap}
+  .ctrl-lbl{font-size:.56rem;min-width:38px;letter-spacing:1px}
+  .fbg{gap:4px;flex-wrap:wrap}
+  .fb{font-size:.62rem;padding:5px 9px;border-radius:4px}
+  .sep{display:none}
+  .search-box{margin-left:0;width:100%;margin-top:4px}
+  .search-box input{width:100%;font-size:.82rem;padding:7px 12px 7px 30px}
+
+  /* Result + sort */
+  .result-bar{flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .rc{font-size:.68rem;width:100%}
+  .sort-grp{margin-left:0;flex-wrap:wrap;gap:4px}
+  .sb{font-size:.58rem;padding:4px 8px}
+
+  /* Grid — single column */
+  #grid{grid-template-columns:1fr;gap:8px}
+
+  /* Section dividers */
+  .sec-hdr{margin-top:6px;padding:4px 0 2px}
+  .sec-name{font-size:.85rem;letter-spacing:2px}
+  .sec-cnt{font-size:.58rem;padding:2px 7px}
+
+  /* Cards */
+  .card-body{padding:11px 12px}
+  .hero-name{font-size:1.05rem;letter-spacing:1px}
+  .rp{font-size:.52rem;padding:2px 5px}
+  .ch-badge{font-size:.58rem;padding:2px 7px;margin-bottom:5px}
+  .ch-dots{gap:3px;margin-bottom:5px}
+  .cd{width:14px;height:4px}
+  .lane-tag{font-size:.56rem;margin-bottom:5px}
+  .task-text{font-size:.72rem;margin-bottom:8px;min-height:22px}
+  .pb-track{height:5px}
+  .pb-num{font-size:.8rem;min-width:42px}
+  .edit-hint{display:none}
+
+  /* Modal — slide up from bottom like a sheet */
+  .modal-bg{padding:0;align-items:flex-end}
+  .modal{
+    border-radius:18px 18px 0 0;
+    max-width:100%;
+    max-height:90vh;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  /* drag handle visual hint */
+  .modal::before{
+    content:'';display:block;
+    width:36px;height:4px;border-radius:99px;
+    background:var(--rim2);
+    margin:10px auto 0;
+  }
+  .modal-header{padding:14px 16px 12px}
+  .modal-title{font-size:1.25rem}
+  .modal-subtitle{font-size:.65rem}
+  .modal-body{padding:12px 16px}
+  /* Prevent iOS auto-zoom on input focus */
+  .field select,.field input,.field textarea{
+    font-size:16px!important;
+    padding:11px 12px;
+  }
+  .field label{font-size:.65rem}
+  .field{margin-bottom:12px}
+  .field-row{grid-template-columns:1fr 1fr;gap:8px}
+  .mastery-preview{font-size:.74rem;padding:9px 12px}
+  .prio-toggle-row{padding:11px 12px}
+  .prio-toggle-label{font-size:.78rem}
+  .prio-toggle-label .pdesc{font-size:.64rem}
+  .modal-footer{
+    padding:12px 16px 28px; /* extra bottom for iPhone home bar */
+    gap:8px;
+  }
+  .btn-save,.btn-cancel{
+    flex:1;text-align:center;
+    padding:13px 10px; /* larger tap target */
+    font-size:.76rem;
+  }
+
+  /* Toast — full width at bottom */
+  .toast{
+    bottom:16px;right:10px;left:10px;
+    text-align:center;font-size:.76rem;
+    padding:10px 14px;
+  }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="hx">ML</div>
+  <div class="h-title">
+    <h1>MLBB Training Progress</h1>
+    <p>Hero Mastery Chapter Tracker &nbsp;·&nbsp; Land of Dawn</p>
+  </div>
+  <div class="h-stats">
+    <div class="bkp-wrap">
+      <button class="bkp-btn save" onclick="saveBackup()">💾 Save Backup</button>
+      <button class="bkp-btn load" onclick="document.getElementById('bkp-input').click()">📂 Load Backup</button>
+      <input type="file" id="bkp-input" accept=".json" style="display:none" onchange="loadBackup(event)">
+    </div>
+  </div>
+</header>
+
+<!-- PROGRESS PANELS -->
+<div class="prog-panels">
+  <div class="panel">
+    <div class="panel-title">Hero Progress <span id="pp-total">132</span></div>
+    <div class="ch-dist" id="ch-dist"></div>
+    <div class="ch-dist-labels" id="ch-labels"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-title">Chapter Progress <span id="pp-chpct">0%</span></div>
+    <div class="prog-row">
+      <div class="prog-label"><span>Completed Chapters</span><span class="pct" id="pct-done">0%</span></div>
+      <div class="track"><div class="fill fill-done" id="bar-done" style="width:0%"></div></div>
+    </div>
+    <div class="prog-row">
+      <div class="prog-label"><span>Remaining Chapters</span><span class="pct" id="pct-rem">0%</span></div>
+      <div class="track"><div class="fill fill-rem" id="bar-rem" style="width:0%"></div></div>
+    </div>
+    <div class="stat3">
+      <div class="s3 t-total"><div class="s3-n" id="s3-total">0</div><div class="s3-l">Total Chapters</div></div>
+      <div class="s3 t-done"><div class="s3-n" id="s3-done">0</div><div class="s3-l">Completed</div></div>
+      <div class="s3 t-rem"><div class="s3-n" id="s3-rem">0</div><div class="s3-l">Remaining</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTROLS -->
+<div class="ctrl-wrap">
+  <div class="ctrl-row">
+    <span class="ctrl-lbl">Role</span>
+    <div class="fbg" id="role-f">
+      <button class="fb on" data-role="ALL">All</button>
+      <button class="fb" data-role="Tank">Tank</button>
+      <button class="fb" data-role="Fighter">Fighter</button>
+      <button class="fb" data-role="Assassin">Assassin</button>
+      <button class="fb" data-role="Mage">Mage</button>
+      <button class="fb" data-role="Marksman">Marksman</button>
+      <button class="fb" data-role="Support">Support</button>
+    </div>
+    <div class="sep"></div>
+    <span class="ctrl-lbl">Lane</span>
+    <div class="fbg" id="lane-f">
+      <button class="fb on" data-lane="ALL">All</button>
+      <button class="fb" data-lane="Gold">Gold</button>
+      <button class="fb" data-lane="Exp">Exp</button>
+      <button class="fb" data-lane="Mid">Mid</button>
+      <button class="fb" data-lane="Jungle">Jungle</button>
+      <button class="fb" data-lane="Roam">Roam</button>
+    </div>
+  </div>
+  <div class="ctrl-row">
+    <span class="ctrl-lbl">Chapter</span>
+    <div class="fbg" id="ch-f">
+      <button class="fb on" data-ch="ALL">All</button>
+      <button class="fb" data-ch="1">Ch 1</button>
+      <button class="fb" data-ch="2">Ch 2</button>
+      <button class="fb" data-ch="3">Ch 3</button>
+      <button class="fb" data-ch="4">Ch 4</button>
+      <button class="fb" data-ch="Completed">Mastered</button>
+    </div>
+    <div class="sep"></div>
+    <span class="ctrl-lbl">Priority</span>
+    <div class="fbg" id="prio-f">
+      <button class="fb on" data-prio="ALL">All</button>
+      <button class="fb" data-prio="true">🔥 Priority Only</button>
+    </div>
+    <div class="search-box">
+      <span class="si">⌕</span>
+      <input type="text" id="search" placeholder="Search hero…">
+    </div>
+  </div>
+</div>
+
+<!-- RESULT & SORT -->
+<div class="result-bar">
+  <span class="rc" id="rc">Showing all 132 heroes</span>
+  <div class="sort-grp">
+    <button class="sb on" data-sort="role">By Role</button>
+    <button class="sb" data-sort="chapter">By Chapter</button>
+    <button class="sb" data-sort="name">A–Z</button>
+    <button class="sb" data-sort="progress">By Progress</button>
+  </div>
+</div>
+
+<!-- GRID -->
+<div id="grid"><div id="empty"><svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" stroke="#4a6a8a" stroke-width="2" fill="none"/><path d="M18 18l20 20M38 18L18 38" stroke="#4a6a8a" stroke-width="2" stroke-linecap="round"/></svg><p>No heroes match your filters</p></div></div>
+
+</div><!-- /wrap -->
+
+<!-- EDIT MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="m-title">Hero Name</div>
+        <div class="modal-subtitle" id="m-sub">Role · Lane</div>
+      </div>
+      <button class="modal-close" onclick="closeModal(null)">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="mastery-preview" id="mastery-preview">
+        ⚡ Setting to Completed will mark this hero as fully MASTERED
+      </div>
+      <div class="prio-toggle-row" id="prio-toggle" onclick="togglePriority()">
+        <div class="prio-toggle-label">
+          <span class="pico">🔥</span>
+          <div><div class="ptxt">Mark as Priority</div><div class="pdesc">Highlight this hero task to focus on next</div></div>
+        </div>
+        <div class="prio-switch" id="prio-switch"></div>
+      </div>
+      <div class="field">
+        <label>On-Going Chapter</label>
+        <select id="m-ch" onchange="onChapterChange()">
+          <option value="1">Chapter 1</option>
+          <option value="2">Chapter 2</option>
+          <option value="3">Chapter 3</option>
+          <option value="4">Chapter 4</option>
+          <option value="Completed">Completed (All Mastered)</option>
+        </select>
+      </div>
+      <div class="field" id="f-mission">
+        <label>On-Going Chapter Mission</label>
+        <textarea id="m-mission" rows="2"></textarea>
+      </div>
+      <div class="field-row" id="f-targact">
+        <div class="field">
+          <label>Target</label>
+          <input type="text" id="m-target" placeholder="e.g. 10">
+        </div>
+        <div class="field">
+          <label>Actual</label>
+          <input type="text" id="m-actual" placeholder="e.g. 3">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal(null)">Cancel</button>
+      <button class="btn-save" onclick="saveHero()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ Hero updated successfully</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  DATA  (sourced from MLBB_Chapter_Progress_v20260503.xlsx)
+//  Format: [name, roles[], lanes[], chapter, mission, target, actual]
+// ═══════════════════════════════════════════════════════════════
+const BASE = [
+// Gold Lane
+["Lesley",["Marksman","Assassin"],["Gold"],"Completed","MASTERY","DONE","DONE"],
+["Miya",["Marksman"],["Gold"],4,"Get Kills with full stacks of Moon Blessing",60,7],
+["Bruno",["Marksman"],["Gold"],"Completed","MASTERY","DONE","DONE"],
+["Clint",["Marksman"],["Gold"],3,"Double Shot 4 times in quick succession",10,5],
+["Layla",["Marksman"],["Gold"],"Completed","MASTERY","DONE","DONE"],
+["Yi Sun-Shin",["Marksman","Assassin"],["Gold"],1,"Blood Flood — shoot fully powered arrows",5,0],
+["Moskov",["Marksman"],["Gold"],2,"Kill enemy with Penetration damage",2,0],
+["Roger",["Marksman","Fighter"],["Gold"],1,"Kill enemy heroes during Bloodthirsty Howl",7,1],
+["Karrie",["Marksman"],["Gold"],4,"Double Kill using Speedy Lightwheel Ult",5,0],
+["Irithel",["Marksman"],["Gold"],"Completed","MASTERY","DONE","DONE"],
+["Hanabi",["Marksman"],["Gold"],"Completed","MASTERY","DONE","DONE"],
+["Claude",["Marksman"],["Gold"],4,"Deal 5,000 damage per minute",2,0],
+["Kimmy",["Marksman","Mage"],["Gold"],1,"===== WIN =====",2,0],
+["Granger",["Marksman"],["Gold"],2,"Rhapsody — hit same enemy with all 6 bullets",12,0],
+["Wanwan",["Marksman"],["Gold"],4,"Triple Kill using Crossbow of Tang (Ult)",1,0],
+["Popol & Kupa",["Marksman"],["Gold"],2,"Win with fewest deaths on team",2,0],
+["Brody",["Marksman"],["Gold"],2,"===== WIN =====",4,0],
+["Beatrix",["Marksman"],["Gold"],3,"Win with 65% Teamfight participation",2,0],
+["Natan",["Marksman"],["Gold"],2,"Damage 2 enemies with Interference",10,0],
+["Edith",["Marksman","Tank"],["Gold","Roam"],"Completed","MASTERY","DONE","DONE"],
+["Melissa",["Marksman"],["Gold"],"Completed","MASTERY","DONE","DONE"],
+["Ixia",["Marksman"],["Gold"],4,"Triple Kill under full Barrage",3,0],
+["Obsidia",["Marksman"],["Gold"],4,"Win match with KDA > 10",5,0],
+// Exp Lane – Fighters
+["Grock",["Tank","Fighter"],["Exp"],"Completed","MASTERY","DONE","DONE"],
+["Argus",["Fighter"],["Exp"],3,"===== WIN =====",6,1],
+["Paquito",["Fighter","Assassin"],["Exp"],2,"While in Champ Stance, Knockout 2 airborne enemies",5,0],
+["Hilda",["Tank","Fighter"],["Exp"],"Completed","MASTERY","DONE","DONE"],
+["Balmond",["Fighter"],["Exp"],2,"Accumulate 3 Killing Sprees",3,1],
+["Alucard",["Fighter","Assassin"],["Exp"],1,"===== WIN =====",2,0],
+["Zilong",["Fighter","Assassin"],["Exp"],2,"Use Spear Strike 3 times in 6 seconds",60,6],
+["Freya",["Fighter"],["Exp"],1,"Spirit Combo 4th strike deals 8,000 damage",1,0],
+["Chou",["Fighter"],["Exp"],1,"===== WIN =====",2,0],
+["Sun",["Fighter"],["Exp"],"Completed","MASTERY","DONE","DONE"],
+["Alpha",["Fighter"],["Exp"],1,"Trigger Beta Advanced",60,0],
+["Ruby",["Fighter"],["Exp"],1,"Use Spell Vamp and accumulate 55,000 HP regen",1,0],
+["Lapu-Lapu",["Fighter"],["Exp"],1,"Deal damage by Justice Blades",50000,0],
+["Gatotkaca",["Tank","Fighter"],["Exp","Roam"],"Completed","MASTERY","DONE","DONE"],
+["Jawhead",["Fighter"],["Exp"],1,"Purchase Blade of Heptaseas in 5 min",1,0],
+["Martis",["Fighter"],["Exp"],2,"Use Asura Aura control 2E",15,0],
+["Kaja",["Fighter","Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Aldous",["Fighter"],["Exp"],1,"Partake in 3 matches without AFK till end",3,0],
+["Leomord",["Fighter"],["Exp","Jungle"],1,"Hit an enemy hero with the maximum charge of Momentum",15,0],
+["Thamuz",["Fighter"],["Exp"],2,"Use Lava Mallet passive ability",1,0],
+["Minsitthar",["Fighter"],["Exp"],2,"Pull 2 enemies with a single Spear of Glory",5,0],
+["Badang",["Fighter"],["Exp"],"Completed","MASTERY","DONE","DONE"],
+["Guinevere",["Fighter"],["Exp"],4,"===== WIN =====",6,2],
+["Terizla",["Tank","Fighter"],["Exp"],"Completed","MASTERY","DONE","DONE"],
+["X.Borg",["Fighter"],["Exp"],1,"Use Fire Missiles and deal 50,000 True Damage",50000,0],
+["Dyrroth",["Fighter"],["Exp"],1,"Use Passive Wrath of Abyss and deal 20,000 damage",20000,0],
+["Masha",["Tank","Fighter"],["Exp"],4,"Score 5 Double Kills with only 1 HP bar left",5,0],
+["Silvanna",["Fighter"],["Exp"],4,"Deal the most damage of both sides",2,0],
+["Yu Zhong",["Fighter"],["Exp"],1,"Deal 25,000 damage with Sharpened Edge Dragon Tail",25000,0],
+["Benedetta",["Fighter","Assassin"],["Exp","Jungle"],1,"Deal 100,000 damage",100000,0],
+["Khaleed",["Fighter"],["Exp"],1,"===== WIN =====",2,0],
+["Barats",["Tank","Fighter"],["Exp"],1,"Deal 5,000 damage with Trample effect",1,0],
+["Phoveus",["Fighter"],["Exp"],1,"Use Internal Pursuit",10,0],
+["Aulus",["Fighter"],["Exp"],3,"Kill during Cleaving Axe",15,0],
+["Yin",["Fighter","Assassin"],["Exp","Jungle"],1,"Hit 2 enemies with enhanced basic attack",2,1],
+["Julian",["Fighter","Assassin"],["Exp","Jungle"],1,"Cast 10 enhanced skills in one match",10,0],
+["Fredrinn",["Tank","Fighter"],["Exp"],"Completed","MASTERY","DONE","DONE"],
+["Arlott",["Fighter","Assassin"],["Exp"],1,"Hit a marked target with Vengeance",30,0],
+["Cici",["Fighter"],["Exp"],4,"Kill 2 enemies while connected by Bouncy Combo bond",2,0],
+["Suyou",["Fighter","Assassin"],["Jungle"],1,"Deal Damage by Hold Casting Evil Quelie",10000,0],
+["Lukas",["Fighter"],["Exp","Jungle"],1,"Transform into Sacred Beast 3 times in single match",3,0],
+["Kalea",["Fighter","Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Sora",["Fighter","Assassin"],["Exp"],2,"Hit 2 enemies at once with 3rd strike of Sundering Strike",10,0],
+["Nolan",["Assassin"],["Jungle"],1,"Make 2 or more rifts intersect to activate them",30,0],
+// Mid Lane – Mages
+["Faramis",["Mage","Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Alice",["Tank","Mage"],["Exp","Jungle"],"Completed","MASTERY","DONE","DONE"],
+["Nana",["Mage"],["Mid","Roam"],"Completed","MASTERY","DONE","DONE"],
+["Bane",["Fighter","Mage"],["Exp"],"Completed","MASTERY","DONE","DONE"],
+["Eudora",["Mage"],["Mid"],3,"Stun 3 enemies with Ball Lightning",12,0],
+["Gord",["Mage"],["Mid"],"Completed","MASTERY","DONE","DONE"],
+["Kagura",["Mage"],["Mid"],3,"===== WIN =====",6,4],
+["Cyclops",["Mage"],["Mid"],1,"Win match with 25%+ Damage Dealt of team",1,0],
+["Aurora",["Mage"],["Mid"],2,"Freeze 3 enemies with Frigid Glacier / Cold Destruction",10,0],
+["Vexana",["Mage"],["Mid"],2,"Knock up 2 enemies at once",5,0],
+["Harley",["Assassin","Mage"],["Jungle"],1,"Kill enemy before Space Escape ends",6,0],
+["Odette",["Mage"],["Mid"],2,"===== WIN =====",4,0],
+["Zhask",["Mage"],["Mid"],1,"Deal 40% team damage to Turtle",1,0],
+["Pharsa",["Mage"],["Mid"],1,"Accumulate enemy kills",15,0],
+["Valir",["Mage"],["Mid"],3,"Kill 3 enemies while Searing Torrent (Ult) is active",1,0],
+["Chang'e",["Mage"],["Mid"],2,"Kill 2 enemies using Comet from Afar (Ult)",1,0],
+["Selena",["Assassin","Mage"],["Jungle","Roam"],1,"Buy Secret Sentinel before 8 min & win",2,1],
+["Vale",["Mage"],["Mid"],1,"Hit Wind Blade to 2 enemies / kill 1 enemy",12,0],
+["Lunox",["Mage"],["Mid"],1,"Use Chaos Assault 5x within duration",8,7],
+["Harith",["Mage"],["Mid"],3,"Hit enemy with Synchro Fission during Zaman Force",60,0],
+["Kadita",["Assassin","Mage"],["Mid"],"Completed","MASTERY","DONE","DONE"],
+["Esmeralda",["Tank","Mage"],["Exp"],3,"===== WIN =====",6,3],
+["Lylia",["Mage"],["Mid"],4,"Win with fewest deaths on team",3,0],
+["Cecilion",["Mage"],["Mid"],2,"===== WIN =====",4,0],
+["Luo Yi",["Mage"],["Mid","Roam"],2,"Teleport allies with Diversion",25,2],
+["Yve",["Mage"],["Mid"],3,"Kill 2 enemies using Real World Manipulation (Ult)",8,0],
+["Valentina",["Mage"],["Mid"],1,"Hit enemy with Shadow Bolt from Arcane Shade",60,0],
+["Xavier",["Mage"],["Mid"],3,"===== WIN =====",6,0],
+["Novaria",["Mage"],["Mid"],"Completed","MASTERY","DONE","DONE"],
+["Zhuxin",["Mage"],["Mid"],4,"Kill 2 or more enemies with Ultimate",15,0],
+["Zetian",["Mage"],["Mid"],4,"Kill enemy within 10s after using Ultimate",50,0],
+// Roam – Tanks
+["Uranus",["Tank"],["Exp"],"Completed","MASTERY","DONE","DONE"],
+["Johnson",["Tank","Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Minotaur",["Tank","Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Gloo",["Tank"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Tigreal",["Tank"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Akai",["Tank"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Franco",["Tank"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Lolita",["Tank","Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Hylos",["Tank"],["Roam"],4,"Wipe out enemies",1,0],
+["Belerick",["Tank"],["Exp","Roam"],"Completed","MASTERY","DONE","DONE"],
+["Khufra",["Tank"],["Roam"],4,"Stun 3 enemies simultaneously",1,0],
+["Baxia",["Tank"],["Roam"],4,"Take 25% damage of team; deal 20% of team damage",1,0],
+["Carmilla",["Tank","Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Atlas",["Tank"],["Roam"],2,"Perfect Match — pull 3 enemies",1,0],
+["Chip",["Tank","Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+// Jungle – Assassins + Supports
+["Karina",["Assassin"],["Jungle"],3,"===== WIN =====",6,2],
+["Aamon",["Assassin"],["Jungle"],1,"Throw 5 shards on a Soul Shards cast",40,0],
+["Angela",["Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Diggie",["Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Estes",["Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Fanny",["Assassin"],["Jungle"],1,"===== WIN =====",1,0],
+["Floryn",["Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Gusion",["Assassin"],["Jungle"],1,"Use Dagger Specialist — accumulate 12,000 damage with Enhanced Basic Attack",12000,0],
+["Hanzo",["Assassin"],["Jungle"],1,"Use Ninjutsu Demon Feast to devour Creeps 10 times in one match",3,0],
+["Hayabusa",["Assassin"],["Jungle"],1,"Hit the same hero with Ninjutsu: Phantom Shuriken's two attacks",40,0],
+["Helcurt",["Assassin"],["Jungle"],1,"Use Deadly Stinger at 5 stacks to hit enemy heroes",35,0],
+["Joy",["Assassin"],["Jungle"],2,"Score Double Kill using Ultimate",1,0],
+["Lancelot",["Assassin"],["Jungle"],1,"Hit enemy heroes with Puncture 3x within 3 seconds",3,0],
+["Ling",["Assassin"],["Jungle"],1,"Use Defiant Sword from the wall and deal damage",55000,0],
+["Marcel",["Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Mathilda",["Assassin","Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Natalia",["Assassin"],["Jungle"],1,"Kill enemy heroes",15,0],
+["Rafaela",["Support"],["Roam"],"Completed","MASTERY","DONE","DONE"],
+["Saber",["Assassin"],["Jungle"],1,"Kill enemy heroes",10,4],
+];
+
+// ── BUILD HERO OBJECTS ────────────────────────────────────────
+const ROLE_ORDER = ["Tank","Fighter","Assassin","Mage","Marksman","Support"];
+const ROLE_COLORS = {Tank:"var(--tank)",Fighter:"var(--fighter)",Assassin:"var(--assassin)",Mage:"var(--mage)",Marksman:"var(--marksman)",Support:"var(--support)"};
+
+function buildHeroes(base){
+  return base.map(([name,roles,lanes,chapter,mission,target,actual],i)=>({
+    id:i, name, roles, lanes,
+    chapter: chapter==="Completed"?"Completed":Number(chapter),
+    mission, target, actual,
+    mastery: chapter==="Completed"?"X":"",
+    remaining: chapter==="Completed"?0:5-Number(chapter),
+    priority: false
+  }));
+}
+
+let HEROES = buildHeroes(BASE);
+// Load from localStorage if saved
+const saved = localStorage.getItem('mlbb_v3');
+if(saved){ try{ const d=JSON.parse(saved); HEROES=d; }catch(e){} }
+
+function saveToStorage(){ localStorage.setItem('mlbb_v3',JSON.stringify(HEROES)); }
+
+// ── STATE ──────────────────────────────────────────────────────
+let fRole="ALL",fLane="ALL",fCh="ALL",fSearch="",fSort="role",fPriority="ALL";
+let editIdx=-1, modalPriority=false;
+
+// ── STATS & PANELS ────────────────────────────────────────────
+function calcChCount(){
+  const c={1:0,2:0,3:0,4:0,Completed:0};
+  HEROES.forEach(h=>{ const k=h.chapter==="Completed"?"Completed":String(h.chapter); c[k]=(c[k]||0)+1; });
+  return c;
+}
+function calcChapterStats(){
+  const total=HEROES.length*4;
+  let done=0;
+  HEROES.forEach(h=>{
+    if(h.chapter==="Completed") done+=4;
+    else done+=(Number(h.chapter)-1);
+  });
+  return {total, done, rem:total-done};
+}
+
+function renderPanels(){
+  const cc=calcChCount();
+  const T=HEROES.length;
+  // hero chapter dist bar
+  const segs=[
+    {k:"1",   c:"var(--ch1)", label:"Ch 1", pct:cc[1]/T*100},
+    {k:"2",   c:"var(--ch2)", label:"Ch 2", pct:cc[2]/T*100},
+    {k:"3",   c:"var(--ch3)", label:"Ch 3", pct:cc[3]/T*100},
+    {k:"4",   c:"var(--ch4)", label:"Ch 4", pct:cc[4]/T*100},
+    {k:"Completed",c:"var(--cm)",label:"Mastered",pct:cc.Completed/T*100},
+  ];
+  document.getElementById("ch-dist").innerHTML=segs.map(s=>
+    `<div class="ch-seg" style="flex:${s.pct} 1 0%;background:${s.c};color:#fff">${s.pct>5?s.label:''}</div>`
+  ).join('');
+  document.getElementById("ch-labels").innerHTML=segs.map(s=>
+    `<div class="ch-label"><div class="ch-dot" style="background:${s.c}"></div>${s.label}: <strong>${cc[s.k]}</strong> (${Math.round(s.pct)}%)</div>`
+  ).join('');
+  document.getElementById("pp-total").textContent=T;
+
+  // chapter progress
+  const cs=calcChapterStats();
+  const dp=Math.round(cs.done/cs.total*100);
+  const rp=100-dp;
+  document.getElementById("s3-total").textContent=cs.total.toLocaleString();
+  document.getElementById("s3-done").textContent=cs.done.toLocaleString();
+  document.getElementById("s3-rem").textContent=cs.rem.toLocaleString();
+  document.getElementById("pct-done").textContent=dp+"%";
+  document.getElementById("pct-rem").textContent=rp+"%";
+  document.getElementById("bar-done").style.width=dp+"%";
+  document.getElementById("bar-rem").style.width=rp+"%";
+  document.getElementById("pp-chpct").textContent=dp+"%";
+}
+
+// ── FILTER + SORT ─────────────────────────────────────────────
+function getFiltered(){
+  const q=fSearch.toLowerCase();
+  return HEROES.filter(h=>{
+    if(fRole!=="ALL"&&!h.roles.includes(fRole)) return false;
+    if(fLane!=="ALL"&&!h.lanes.includes(fLane)) return false;
+    if(fCh!=="ALL"){
+      const hch=h.chapter==="Completed"?"Completed":String(h.chapter);
+      if(hch!==fCh) return false;
+    }
+    if(fPriority==="true"&&!h.priority) return false;
+    if(q&&!h.name.toLowerCase().includes(q)&&!h.mission.toLowerCase().includes(q)) return false;
+    return true;
+  });
+}
+function sortHeroes(arr){
+  if(fSort==="role") return [...arr].sort((a,b)=>ROLE_ORDER.indexOf(a.roles[0])-ROLE_ORDER.indexOf(b.roles[0])||a.name.localeCompare(b.name));
+  if(fSort==="chapter"){
+    const ord={Completed:99,4:3,3:2,2:1,1:0};
+    return [...arr].sort((a,b)=>{
+      const oa=a.chapter==="Completed"?99:a.chapter;
+      const ob=b.chapter==="Completed"?99:b.chapter;
+      return ob-oa||a.name.localeCompare(b.name);
+    });
+  }
+  if(fSort==="name") return [...arr].sort((a,b)=>a.name.localeCompare(b.name));
+  if(fSort==="progress"){
+    return [...arr].sort((a,b)=>{
+      const pa=a.chapter==="Completed"?1:(Number(a.chapter)-1)/4;
+      const pb=b.chapter==="Completed"?1:(Number(b.chapter)-1)/4;
+      return pb-pa||a.name.localeCompare(b.name);
+    });
+  }
+  return arr;
+}
+
+// ── RENDER CARDS ─────────────────────────────────────────────
+function fmtNum(v){ if(v==="DONE") return "DONE"; const n=Number(v); return isNaN(n)?v:n.toLocaleString(); }
+function progPct(h){
+  if(h.chapter==="Completed") return 100;
+  const t=Number(h.target),a=Number(h.actual);
+  if(!t||!a) return 0;
+  return Math.min(100,Math.round(a/t*100));
+}
+function chDots(ch){
+  if(ch==="Completed") return '<div class="ch-dots">'+[1,2,3,4].map(()=>'<div class="cd done"></div>').join('')+'</div>';
+  const n=Number(ch);
+  return '<div class="ch-dots">'+[1,2,3,4].map(i=>{
+    if(i<n) return '<div class="cd done"></div>';
+    if(i===n) return '<div class="cd active"></div>';
+    return '<div class="cd"></div>';
+  }).join('')+'</div>';
+}
+
+function makeCard(h,delay){
+  const ck=h.chapter==="Completed"?"Completed":String(h.chapter);
+  const chLabel=ck==="Completed"?"★ MASTERED":"CHAPTER "+ck;
+  const pct=progPct(h);
+  const progTxt=h.chapter==="Completed"?"DONE":`${fmtNum(h.actual)} / ${fmtNum(h.target)}`;
+  const roles=h.roles.map(r=>`<span class="rp rp-${r}">${r}</span>`).join('');
+  const lanes=h.lanes.join(' · ');
+  const flameIcon=h.priority?'<span class="prio-flame-icon">🔥</span>':'';
+  const prioClass=h.priority?' is-prio':'';
+  return `<div class="card${prioClass}" data-ch="${ck}" data-id="${h.id}" style="animation-delay:${delay}ms" onclick="openModal(${h.id})">
+    <div class="card-stripe"></div>
+    <div class="card-body">
+      <div class="card-top"><div class="hero-name">${h.name}${flameIcon}</div><div class="rpills">${roles}</div></div>
+      <div class="ch-badge" data-ch="${ck}">${chLabel}</div>
+      ${chDots(h.chapter)}
+      <div class="lane-tag">${lanes}</div>
+      <div class="task-text">${h.mission}</div>
+      <div class="prog-bottom">
+        <div class="pb-track"><div class="pb-fill" style="width:${pct}%"></div></div>
+        <div class="pb-num">${progTxt}</div>
+      </div>
+      <div class="edit-hint">click to edit</div>
+    </div>
+  </div>`;
+}
+
+function render(){
+  renderPanels();
+  const data=sortHeroes(getFiltered());
+  const grid=document.getElementById("grid");
+  document.getElementById("rc").textContent=data.length===HEROES.length?`Showing all ${HEROES.length} heroes`:`Showing ${data.length} of ${HEROES.length} heroes`;
+  if(!data.length){
+    grid.innerHTML='<div id="empty" style="display:block;grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--soft)"><svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="24" stroke="#4a6a8a" stroke-width="2" fill="none"/><path d="M18 18l20 20M38 18L18 38" stroke="#4a6a8a" stroke-width="2" stroke-linecap="round"/></svg><p style="margin-top:12px">No heroes match your filters</p></div>';
+    return;
+  }
+  let html=""; let delay=0;
+  if(fSort==="role"){
+    ROLE_ORDER.forEach(role=>{
+      const grp=data.filter(h=>h.roles[0]===role);
+      if(!grp.length) return;
+      const c=ROLE_COLORS[role];
+      html+=`<div class="sec-hdr" style="grid-column:1/-1"><div class="sec-dot" style="background:${c};box-shadow:0 0 6px ${c}"></div><span class="sec-name" style="color:${c}">${role}</span><div class="sec-line"></div><span class="sec-cnt">${grp.length}</span></div>`;
+      grp.forEach(h=>{ html+=makeCard(h,delay); delay=Math.min(delay+18,280); });
+    });
+  } else {
+    data.forEach(h=>{ html+=makeCard(h,delay); delay=Math.min(delay+12,300); });
+  }
+  grid.innerHTML=html;
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(id){
+  const h=HEROES.find(x=>x.id===id);
+  if(!h) return;
+  editIdx=id;
+  modalPriority=!!h.priority;
+  document.getElementById("m-title").textContent=h.name;
+  document.getElementById("m-sub").textContent=h.roles.join(" · ")+" · "+h.lanes.join(", ");
+  document.getElementById("m-ch").value=h.chapter==="Completed"?"Completed":String(h.chapter);
+  document.getElementById("m-mission").value=h.mission;
+  document.getElementById("m-target").value=h.target==="DONE"?"":h.target;
+  document.getElementById("m-actual").value=h.actual==="DONE"?"":h.actual;
+  // sync priority toggle
+  const pt=document.getElementById("prio-toggle");
+  modalPriority?pt.classList.add("active"):pt.classList.remove("active");
+  onChapterChange();
+  document.getElementById("modal-bg").classList.add("open");
+}
+function closeModal(e){
+  if(e&&e.target!==document.getElementById("modal-bg")) return;
+  document.getElementById("modal-bg").classList.remove("open");
+  editIdx=-1;
+}
+function onChapterChange(){
+  const v=document.getElementById("m-ch").value;
+  const isCompleted=v==="Completed";
+  document.getElementById("mastery-preview").classList.toggle("show",isCompleted);
+  document.getElementById("m-mission").disabled=isCompleted;
+  document.getElementById("m-target").disabled=isCompleted;
+  document.getElementById("m-actual").disabled=isCompleted;
+  if(isCompleted){
+    document.getElementById("m-mission").value="MASTERY";
+    document.getElementById("m-target").value="DONE";
+    document.getElementById("m-actual").value="DONE";
+  }
+}
+function togglePriority(){
+  modalPriority=!modalPriority;
+  const pt=document.getElementById("prio-toggle");
+  modalPriority?pt.classList.add("active"):pt.classList.remove("active");
+}
+function saveHero(){
+  if(editIdx<0) return;
+  const h=HEROES.find(x=>x.id===editIdx);
+  if(!h) return;
+  const ch=document.getElementById("m-ch").value;
+  h.priority=modalPriority;
+  if(ch==="Completed"){
+    h.chapter="Completed"; h.mission="MASTERY"; h.mastery="X";
+    h.target="DONE"; h.actual="DONE"; h.remaining=0;
+  } else {
+    h.chapter=parseInt(ch);
+    h.mission=document.getElementById("m-mission").value||h.mission;
+    const tVal=document.getElementById("m-target").value;
+    const aVal=document.getElementById("m-actual").value;
+    h.target=isNaN(Number(tVal))||tVal===""?h.target:Number(tVal);
+    h.actual=isNaN(Number(aVal))||aVal===""?h.actual:Number(aVal);
+    h.mastery=""; h.remaining=5-h.chapter;
+  }
+  saveToStorage();
+  document.getElementById("modal-bg").classList.remove("open");
+  editIdx=-1;
+  render();
+  const flag=h.priority?" 🔥":"";
+  showToast("✓ "+h.name+flag+" updated successfully");
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"),2800);
+}
+
+// ── JSON BACKUP ───────────────────────────────────────────────
+function saveBackup(){
+  const payload = {
+    version: 1,
+    savedAt: new Date().toISOString(),
+    heroes: HEROES
+  };
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], {type: 'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const d    = new Date();
+  const ts   = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `MLBB_Backup_${ts}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('💾 Backup saved — MLBB_Backup_'+ts+'.json');
+}
+
+function loadBackup(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try{
+      const data = JSON.parse(e.target.result);
+      // validate structure
+      if(!data.heroes || !Array.isArray(data.heroes))
+        throw new Error('Invalid backup file');
+      // restore — preserve id order, merge with BASE for any missing fields
+      HEROES = data.heroes.map(h => ({
+        ...h,
+        priority: h.priority || false
+      }));
+      saveToStorage();
+      render();
+      const saved = data.savedAt ? new Date(data.savedAt).toLocaleDateString() : 'unknown date';
+      showToast('📂 Backup loaded — saved on '+saved);
+    } catch(err){
+      showToast('❌ Failed to load — invalid backup file');
+    }
+    // reset input so same file can be loaded again
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// ── FILTER WIRING ─────────────────────────────────────────────
+function bindFilter(id,prop){
+  document.getElementById(id).addEventListener("click",e=>{
+    const b=e.target.closest(".fb"); if(!b) return;
+    document.querySelectorAll(`#${id} .fb`).forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    if(prop==="fRole") fRole=b.dataset.role;
+    if(prop==="fLane") fLane=b.dataset.lane;
+    if(prop==="fCh")   fCh=b.dataset.ch;
+    render();
+  });
+}
+bindFilter("role-f","fRole"); bindFilter("lane-f","fLane"); bindFilter("ch-f","fCh");
+document.getElementById("prio-f").addEventListener("click",e=>{
+  const b=e.target.closest(".fb"); if(!b) return;
+  document.querySelectorAll("#prio-f .fb").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); fPriority=b.dataset.prio; render();
+});
+document.getElementById("search").addEventListener("input",e=>{ fSearch=e.target.value; render(); });
+document.querySelectorAll(".sb").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".sb").forEach(x=>x.classList.remove("on"));
+  b.classList.add("on"); fSort=b.dataset.sort; render();
+}));
+document.getElementById("m-ch").addEventListener("change",onChapterChange);
+
+// ── INIT ──────────────────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
